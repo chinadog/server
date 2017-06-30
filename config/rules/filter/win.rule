@@ -1,0 +1,7 @@
+// неудачная попытка входа в систему
+find:msg,"4625:(.*?)FAILURE"|regset:msg,"Имя учетной записи:.*?Имя учетной записи: (.*?) Сведения",0,user|
+	concat:res,"Учетной записи не удалось выполнить вход в систему. Имя учетной записи ",user|
+	danger:Microsoft,Windows,1001,LOGIN,4,res,msg|
+find:msg,"abc"|eventlog:"test log"|
+
+

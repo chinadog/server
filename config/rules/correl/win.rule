@@ -1,0 +1,26 @@
+// неудачные попытки входа в систему
+find:msg,"не удалось выполнить вход в систему"|findprev:prevmsg,"не удалось выполнить вход в систему",30,3|
+	concat:res,"Обнаружено большое число неудачных попыток входа в систему. ",msg|
+	alert:host,Microsoft,Windows,5001,NSD,4,res,fullmsg|
+// неудачные попытки входа в систему
+find:msg,"не удалось выполнить вход в систему (.*?) раз"|
+	concat:res,"Обнаружено большое число неудачных попыток входа в систему. ",msg|
+	alert:host,Microsoft,Windows,5001,NSD,4,res,fullmsg|
+// неудачная попытка удаления файла
+find:msg,"Неудачная попытка удаления файла"|alert:host,Microsoft,Windows,5002,NSD,4,msg,fullmsg|
+// неудачная попытка изменения пароля
+find:msg,"Неудачная попытка изменения пароля"|alert:host,Microsoft,Windows,3002,PASS,4,msg,fullmsg|
+// очистка журнала аудита
+find:msg,"Журнал аудита был очищен"|alert:host,Microsoft,Windows,5003,NSD,4,msg,fullmsg|
+// подключение флешки
+find:msg,"Подключили"|regset:msg,"Серийный номер: (.*?);",0,usb|
+	checkusb:host,usb|concat:res,"Обнаружено подключение USB утройства, не являющегося доверенным",usb|
+	alert:host,Microsoft,Windows,6620,HW,2,res,fullmsg|
+	concat:query,"INSERT INTO UsbHosts (UsbSerial,Host) VALUES ('",usb,"','",host,"')"|
+	action:"Сделать доверенным",query|
+// обрыв связи с агентом
+find:sid,"7000"|regset:msg,"агентом (.*?)$",0,dangerhost|
+	alert:dangerhost,Microsoft,Windows,7000,HW,2,msg,fullmsg|
+// Проверка сложности пароля
+find:msg,"Пароль не удовлетворяет"|alert:host,Microsoft,Windows,8000,PASS,2,msg,fullmsg|
+
